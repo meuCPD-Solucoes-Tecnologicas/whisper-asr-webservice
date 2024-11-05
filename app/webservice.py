@@ -3,6 +3,8 @@ import os
 from os import path
 from typing import Annotated, BinaryIO, Optional, Union
 from urllib.parse import quote
+from fastapi.middleware.cors import CORSMiddleware
+
 
 import click
 import ffmpeg
@@ -31,6 +33,15 @@ app = FastAPI(
     contact={"url": projectMetadata["Home-page"]},
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
     license_info={"name": "MIT License", "url": projectMetadata["License"]},
+)
+
+# Configura o CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite apenas o domínio do seu frontend
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permite todos os cabeçalhos
 )
 
 assets_path = os.getcwd() + "/swagger-ui-assets"
