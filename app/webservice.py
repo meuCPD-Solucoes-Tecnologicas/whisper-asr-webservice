@@ -15,6 +15,11 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from whisper import tokenizer
+import os
+
+#print certs
+print(os.listdir("/app"))
+
 
 ASR_ENGINE = os.getenv("ASR_ENGINE", "openai_whisper")
 if ASR_ENGINE == "faster_whisper":
@@ -151,12 +156,27 @@ def load_audio(file: BinaryIO, encode=True, sr: int = SAMPLE_RATE):
     default=9000,
     help="Port for the webservice (default: 9000)",
 )
+@click.option(
+    "--ssl-keyfile",
+    metavar="SSL_KEYFILE",
+    default=None,
+    help="SSL key file for HTTPS",
+)
+@click.option(
+    "--ssl-certfile",
+    metavar="SSL_CERTFILE",
+    default=None,
+    help="SSL certificate file for HTTPS",
+)
 @click.version_option(version=projectMetadata["Version"])
 def start(
     host: str,
-    port: Optional[int] = None
+    port: Optional[int] = None,
+    ssl_keyfile: Optional[str] = None,
+    ssl_certfile: Optional[str] = None
 ):
-    uvicorn.run(app, host=host, port=port)
+    uvicorn.run(app, host=host, port=port, ssl_keyfile=ssl_keyfile, ssl_certfile=ssl_certfile)
 
 if __name__ == "__main__":
-    start()
+    #arquivos de cert server.crt e server.key
+    start(ssl_certfile="./app/server.crt", ssl_keyfile="./app/server.key", port=9000)
